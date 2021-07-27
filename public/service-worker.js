@@ -1,6 +1,3 @@
-const { response } = require("express");
-const { version } = require("mongoose");
-
 const FILES_TO_CACHE = [
     "./index.html",
     "./css/styles.css",
@@ -20,17 +17,17 @@ const APP_PREFIX = "Budget-";
 const VERSION = "version_1";
 const CACHE_NAME = APP_PREFIX + VERSION;
 
-self.addEventListener("install", (event) => {
+self.addEventListener("install", function(event){
     event.waitUntil(
         caches.open(CACHE_NAME).then(function (cache) {
-            console.log(`Installing Chache: ${CACHE_NAME}`);
+            console.log("Installing Chache: " + CACHE_NAME);
             return cache.addAll(FILES_TO_CACHE);
         })
     );
 });
 
-self.addEventListener("activate", (event) => {
-    caches.waitUntil(
+self.addEventListener("activate", function(event){
+    event.waitUntil(
         caches.keys().then(function(keys){
             let cacheKeepList = keys.filter(function(key){
                 return key.indexOf(APP_PREFIX);
@@ -40,7 +37,7 @@ self.addEventListener("activate", (event) => {
             return Promise.all(
                 keys.map(function(key, i){
                     if(cacheKeepList.indexOf(key) === -1){
-                        console.log(`Deleting Cache: ${keys[i]}`);
+                        console.log("Deleting Cache: " + keys[i]);
                         return caches.delete(keys[i]);
                     }
                 })
@@ -49,7 +46,7 @@ self.addEventListener("activate", (event) => {
     );
 });
 
-self.addEventListener("fetch", (event) => {
+self.addEventListener("fetch", function(event){
     event.respondWith(
         caches.match(event.request)
             .then((response) => {
